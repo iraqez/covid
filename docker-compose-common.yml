@@ -1,0 +1,49 @@
+#https://medium.com/@gerrysabar/deploying-django-app-with-docker-postgresql-to-digital-ocean-3b4238c2eafe
+
+version: "3"
+
+volumes:
+  postgresql-volume:  # pointing volume to db
+
+services:
+  nginx:
+    # при падении будет стараться подняться
+    restart: always
+    # только свежий nginx
+    image: nginx:latest
+    # слушает порт 8080
+    expose:
+      - 80
+    # мапаем порт 80 на его 8080. Тогда сайт будет доступен по адресу localhost. Убедись, что порт у тебя не занят.
+    ports:
+      - "80"
+    # монтируем только те директории, в которых лежит статика, т.к. nginx с динамикой не будет работать. Также директорию с логами и файл настройки, который мы подготовили.
+    volumes:
+      - ./static:/srv/www/covid/static
+      - ./staticfiles:/srv/www/covid/staticfiles
+      - ./media:/srv/www/covid/media
+      - ./logs:/srv/www/covid/logs
+      - ./nginx:/etc/nginx/conf.d
+    # и nginx зависит от контейнера python. Т.е. python должен быть запущен первым
+    depends_on:
+      - python
+
+  python:
+    depends_on:
+      - db
+    build: .
+    volumes:
+      - .:/covidapp  # djangoapp mounted to docker from current directory
+      - ./static:/static # adding static & media file for django
+      - ./media:/media
+    expose:
+      - 8000
+#    ports:
+#      - 8000:8000
+    # запускаем gunicorn
+    command: ./entrypoint.sh
+
+  db:
+    image: postgres:10.1  # install postgre here
+    volumes:
+      - postgresql-volume:/var/lib/postgresql/data # avoid data removal when shut docker down we put volume in our local

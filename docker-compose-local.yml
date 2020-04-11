@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  nginx:
+    ports:
+      - "80:80"
+  python:
+    env_file:
+      - docker_compose_dev.env
+
+  db:
+    expose:
+      - 5432
+    env_file:
+      - docker_compose_dev.env
+
+networks:
+    default:
+       external:
+         name: webproxy

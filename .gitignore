@@ -1,0 +1,11 @@
+# Project exclude paths
+/venv/
+*.sqlite3
+.idea
+/static/admin/
+/assets/
+/logs
+/staticfiles
+/docker_compose_prod.env
+/docker_compose_dev.env
+/zolaris/development.env

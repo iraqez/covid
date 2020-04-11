@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  nginx:
+    environment:
+      - DOMAIN=zolaris.me-ua.com
+      - LETSENCRYPT_EMAIL=vladimir.gumenyuk@gmail.com
+      - VIRTUAL_HOST=zolaris.me-ua.com
+      - LETSENCRYPT_HOST=zolaris.me-ua.com
+  python:
+    env_file:
+      - docker_compose_prod.env
+
+  db:
+    expose:
+      - 5432
+    env_file:
+      - docker_compose_prod.env
+
+networks:
+    default:
+       external:
+         name: webproxy
